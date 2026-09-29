@@ -80,7 +80,7 @@ def solve(task: Task, llm: LLMClient, n_candidates: int = N_CANDIDATES,
         else:
             messages = revision_messages(shown, task.n_columns, n_candidates,
                                          _feedback(last_records), parse_note)
-        raw = llm.chat(messages)
+        raw = llm.chat(messages, salt=f"{task.id}/round{rnd}")
         codes = parse_candidates(raw)
         round_log = {"round": rnd, "prompt": messages[-1]["content"], "response": raw,
                      "parsed": codes is not None, "candidates": []}

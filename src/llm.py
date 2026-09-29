@@ -36,8 +36,14 @@ class LLMClient:
     base_url: str
     api_key: str
     temperature: float = 0.7
-    max_tokens: int = 4096
+    # Reasoning models spend part of this on hidden reasoning before the answer.
+    max_tokens: int = 6000
+    # Some free tiers cap prompt + max_tokens per request (Groq: 8000 tokens per
+    # minute), so max_tokens shrinks to fit long prompts under this ceiling.
+    request_token_cap: int = 7800
     max_retries: int = 8
+    # Longer server-requested waits mean a daily quota, not a burst limit.
+    max_wait: float = 600
     use_cache: bool = True
     usage: Usage = field(default_factory=Usage)
 
@@ -55,18 +61,23 @@ class LLMClient:
             model=model or os.environ.get("LLM_MODEL", "openai/gpt-oss-120b"),
             base_url=os.environ.get("LLM_BASE_URL", "https://api.groq.com/openai/v1"),
             api_key=api_key,
+            request_token_cap=int(os.environ.get("LLM_REQUEST_TOKEN_CAP", 7800)),
             **kwargs,
         )
 
-    def _cache_path(self, messages: list[dict]) -> Path:
+    def _cache_path(self, messages: list[dict], salt: str) -> Path:
         key = json.dumps({"model": self.model, "temperature": self.temperature,
-                          "max_tokens": self.max_tokens, "messages": messages},
+                          "max_tokens": self.max_tokens, "messages": messages, "salt": salt},
                          sort_keys=True, ensure_ascii=True)
         return CACHE_DIR / f"{hashlib.sha256(key.encode()).hexdigest()}.json"
 
-    def chat(self, messages: list[dict]) -> str:
-        """Send a chat request in JSON mode and return the raw text of the reply."""
-        path = self._cache_path(messages)
+    def chat(self, messages: list[dict], salt: str = "") -> str:
+        """Send a chat request in JSON mode and return the raw text of the reply.
+
+        `salt` only affects the cache key, so asking the same prompt twice on
+        purpose (say, as a retry) gets a fresh sample rather than a replay.
+        """
+        path = self._cache_path(messages, salt)
         if self.use_cache and path.is_file():
             cached = json.loads(path.read_text(encoding="utf-8"))
             content, usage = cached["content"], cached.get("usage") or {}
@@ -79,9 +90,14 @@ class LLMClient:
         self.usage.completion_tokens += usage.get("completion_tokens") or 0
         if self.use_cache and not path.is_file():
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(json.dumps({"model": self.model, "content": content, "usage": usage}),
-                            encoding="utf-8")
+            path.write_text(json.dumps({"model": self.model, "content": content, "usage": usage},
+                                       ensure_ascii=False), encoding="utf-8")
         return content
+
+    def _completion_budget(self, messages: list[dict]) -> int:
+        # About 3 characters per token is a deliberately high estimate for this text.
+        est_prompt = sum(len(m["content"]) for m in messages) // 3 + 50
+        return max(1024, min(self.max_tokens, self.request_token_cap - est_prompt))
 
     def _request(self, messages: list[dict]) -> tuple[str, dict]:
         delay = 5.0
@@ -91,13 +107,19 @@ class LLMClient:
                     model=self.model,
                     messages=messages,
                     temperature=self.temperature,
-                    max_tokens=self.max_tokens,
+                    max_tokens=self._completion_budget(messages),
                     response_format={"type": "json_object"},
                 )
                 usage = resp.usage.model_dump() if resp.usage else {}
+                usage["finish_reason"] = resp.choices[0].finish_reason
                 return resp.choices[0].message.content or "", usage
             except openai.RateLimitError as exc:
                 wait = _retry_after(exc) or delay
+                if wait > self.max_wait:
+                    raise RuntimeError(
+                        f"Rate limit needs a {wait:.0f}s wait, which looks like a daily quota. "
+                        "Re-run the same command later; finished requests are replayed from the cache. "
+                        f"{exc}") from exc
             except (openai.APITimeoutError, openai.APIConnectionError, openai.InternalServerError):
                 wait = delay
             except openai.BadRequestError as exc:
@@ -106,7 +128,7 @@ class LLMClient:
                 # count it as an unparseable round rather than crash the run.
                 failed = _failed_generation(exc)
                 if failed is not None:
-                    return failed, {}
+                    return failed, {"finish_reason": "json_validate_failed"}
                 raise
             if attempt == self.max_retries:
                 raise RuntimeError(f"LLM request still failing after {self.max_retries} retries")

@@ -19,10 +19,13 @@ RULES = f"""Rules for every candidate:
 - Standard library only, and only these modules: {ALLOWED_MODULES_TEXT}. Put imports inside the source string.
 - No file, network or OS access. No eval, exec, getattr, classes, or double-underscore attributes.
 - Each candidate is a complete, self-contained Python source string that defines `transform`.
+- Keep each candidate compact: no comments or docstrings, ideally under 25 lines.
 - Implement a general rule. Do not hard-code the example outputs or build a lookup table from them.
 - `transform` must return a str, or None where the examples show a null output."""
 
 FORMAT = 'Reply with exactly this JSON shape: {"candidates": ["<python source>", ...]}'
+
+MAX_CODE_CHARS_IN_FEEDBACK = 1500
 
 
 def signature(n_columns: int) -> str:
@@ -66,7 +69,10 @@ def revision_messages(examples: list[Example], n_columns: int, n_candidates: int
     """`failures` holds, per failed candidate: {"code", "problem"} or {"code", "cases": [...]}."""
     blocks = []
     for i, f in enumerate(failures, 1):
-        lines = [f"### Candidate {i}", "```python", f["code"].strip(), "```"]
+        code = f["code"].strip()
+        if len(code) > MAX_CODE_CHARS_IN_FEEDBACK:
+            code = code[:MAX_CODE_CHARS_IN_FEEDBACK] + "\n# ... (truncated)"
+        lines = [f"### Candidate {i}", "```python", code, "```"]
         if f.get("problem"):
             lines.append(f"Problem: {f['problem']}")
         for c in f.get("cases", []):
@@ -100,14 +106,16 @@ def parse_candidates(text: str) -> list[str] | None:
     """Pull the list of source strings out of the model's reply, or None if there isn't one."""
     data = None
     try:
-        data = json.loads(text)
+        data = json.loads(text, strict=False)
     except json.JSONDecodeError:
         match = re.search(r"\{.*\}|\[.*\]", text, re.DOTALL)
         if match:
             try:
-                data = json.loads(match.group(0))
+                data = json.loads(match.group(0), strict=False)
             except json.JSONDecodeError:
-                return None
+                pass
+    if data is None:
+        data = _salvage_truncated(text)
     if isinstance(data, dict):
         data = data.get("candidates")
     if not isinstance(data, list):
@@ -118,6 +126,28 @@ def parse_candidates(text: str) -> list[str] | None:
             item = item.get("code") or item.get("source")
         if isinstance(item, str) and item.strip():
             out.append(_strip_fence(item))
+    return out or None
+
+
+def _salvage_truncated(text: str) -> list[str] | None:
+    """Recover the complete strings from a reply cut off partway through the list.
+
+    A reply that hits the token limit mid-way through candidate 4 still holds
+    three usable candidates; throwing them away would waste a whole round.
+    """
+    start = re.search(r'"candidates"\s*:\s*\[', text)
+    if not start:
+        return None
+    decoder = json.JSONDecoder(strict=False)  # tolerate raw newlines inside strings
+    pos, out = start.end(), []
+    while True:
+        while pos < len(text) and text[pos] in " \t\r\n,":
+            pos += 1
+        try:
+            item, pos = decoder.raw_decode(text, pos)
+        except json.JSONDecodeError:
+            break
+        out.append(item)
     return out or None
 
 
