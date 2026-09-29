@@ -61,6 +61,8 @@ def main(argv: list[str] | None = None) -> None:
             "held_out_input_seen_in_given": t["held_out_input_seen_in_given"],
             "n_survivors": t.get("n_survivors", 0),
             "any_survivor_passes": any(passed_flags),
+            "rounds_used": len(t["rounds"]),
+            "unparsed_rounds": sum(not r["parsed"] for r in t["rounds"]),
         })
         mark = "PASS" if t["passed"] else "fail"
         print(f"[{i:>2}/{len(ids)}] {mark}  round={t['round_solved']!s:<8} {task_id}  "

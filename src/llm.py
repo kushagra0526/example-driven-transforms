@@ -44,6 +44,10 @@ class LLMClient:
     max_retries: int = 8
     # Longer server-requested waits mean a daily quota, not a burst limit.
     max_wait: float = 600
+    # Server-side JSON mode is off by default: on some providers it rejects a
+    # reply outright (returning nothing) over small defects the local parser in
+    # prompts.py tolerates, which would waste a whole round.
+    json_mode: bool = False
     use_cache: bool = True
     usage: Usage = field(default_factory=Usage)
 
@@ -67,12 +71,13 @@ class LLMClient:
 
     def _cache_path(self, messages: list[dict], salt: str) -> Path:
         key = json.dumps({"model": self.model, "temperature": self.temperature,
-                          "max_tokens": self.max_tokens, "messages": messages, "salt": salt},
+                          "max_tokens": self.max_tokens, "json_mode": self.json_mode,
+                          "messages": messages, "salt": salt},
                          sort_keys=True, ensure_ascii=True)
         return CACHE_DIR / f"{hashlib.sha256(key.encode()).hexdigest()}.json"
 
     def chat(self, messages: list[dict], salt: str = "") -> str:
-        """Send a chat request in JSON mode and return the raw text of the reply.
+        """Send a chat request and return the raw text of the reply.
 
         `salt` only affects the cache key, so asking the same prompt twice on
         purpose (say, as a retry) gets a fresh sample rather than a replay.
@@ -108,7 +113,7 @@ class LLMClient:
                     messages=messages,
                     temperature=self.temperature,
                     max_tokens=self._completion_budget(messages),
-                    response_format={"type": "json_object"},
+                    **({"response_format": {"type": "json_object"}} if self.json_mode else {}),
                 )
                 usage = resp.usage.model_dump() if resp.usage else {}
                 usage["finish_reason"] = resp.choices[0].finish_reason
