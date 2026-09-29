@@ -18,7 +18,8 @@ from pathlib import Path
 import openai
 from dotenv import load_dotenv
 
-CACHE_DIR = Path(__file__).resolve().parent.parent / ".cache" / "llm"
+ROOT = Path(__file__).resolve().parent.parent
+CACHE_DIR = ROOT / ".cache" / "llm"
 
 
 @dataclass
@@ -46,12 +47,12 @@ class LLMClient:
 
     @classmethod
     def from_env(cls, model: str | None = None, **kwargs) -> "LLMClient":
-        load_dotenv()
+        load_dotenv(ROOT / ".env")
         api_key = os.environ.get("LLM_API_KEY", "")
         if not api_key:
             sys.exit("LLM_API_KEY is not set. Copy .env.example to .env and fill it in.")
         return cls(
-            model=model or os.environ.get("LLM_MODEL", "llama-3.3-70b-versatile"),
+            model=model or os.environ.get("LLM_MODEL", "openai/gpt-oss-120b"),
             base_url=os.environ.get("LLM_BASE_URL", "https://api.groq.com/openai/v1"),
             api_key=api_key,
             **kwargs,
