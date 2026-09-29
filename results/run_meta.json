@@ -1,0 +1,17 @@
+{
+  "model": "openai/gpt-oss-120b",
+  "endpoint_host": "api.groq.com",
+  "date": "2026-09-29",
+  "seed": 42,
+  "n_requested": 30,
+  "n_available": 354,
+  "n_candidates": 5,
+  "max_revisions": 2,
+  "timeout": 2.0,
+  "usage": {
+    "calls": 35,
+    "cached_calls": 0,
+    "prompt_tokens": 27410,
+    "completion_tokens": 95732
+  }
+}

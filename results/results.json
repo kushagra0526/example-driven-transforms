@@ -1,0 +1,503 @@
+[
+  {
+    "benchmark_id": "Product.000003",
+    "features": [
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 4,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "DateTime.000021",
+    "features": [
+      "DateTime"
+    ],
+    "passed": false,
+    "round_solved": "unsolved",
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 0,
+    "any_survivor_passes": false,
+    "rounds_used": 3,
+    "unparsed_rounds": 0,
+    "candidates_run": 11,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "Address.000013",
+    "features": [
+      "Conditional",
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 4,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "DateTime.000104",
+    "features": [
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 4,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "DateTime.000089",
+    "features": [
+      "DateTimeRounding",
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "DateTime.000078",
+    "features": [
+      "DateTimeRange",
+      "DateTimeRounding",
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "DateTime.000035",
+    "features": [
+      "DateTime",
+      "Multicolumn"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "DateTime.000016",
+    "features": [
+      "DateTime"
+    ],
+    "passed": false,
+    "round_solved": "unsolved",
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 0,
+    "any_survivor_passes": false,
+    "rounds_used": 3,
+    "unparsed_rounds": 2,
+    "candidates_run": 3,
+    "candidates_repaired": 3
+  },
+  {
+    "benchmark_id": "UserAgent.000002",
+    "features": [
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "Number.000066",
+    "features": [
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 4,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "DateTime.000008",
+    "features": [
+      "DateTimeRange",
+      "DateTimeRounding",
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "Number.000089",
+    "features": [
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "Name.000042",
+    "features": [
+      "Concatenation",
+      "Multicolumn",
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "BillingCode.000001",
+    "features": [
+      "Concatenation"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "Author.000001",
+    "features": [
+      "Conditional",
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 1,
+    "synthetic": false,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 3,
+    "any_survivor_passes": true,
+    "rounds_used": 2,
+    "unparsed_rounds": 0,
+    "candidates_run": 10,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "DateTime.000011",
+    "features": [
+      "Conditional",
+      "DateTime",
+      "Multicolumn"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "DateTime.000075",
+    "features": [
+      "DateTimeRange",
+      "DateTimeRounding",
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 4,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "DateTime.000083",
+    "features": [
+      "DateTimeRounding",
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "Number.000045",
+    "features": [
+      "Numeric",
+      "NumericRounding"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 4,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "Phone.000001",
+    "features": [
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "Address.000014",
+    "features": [
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "Number.000074",
+    "features": [
+      "Numeric"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 2,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "DateTime.000065",
+    "features": [
+      "DateTimeRange",
+      "DateTimeRounding",
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "ShippingCode.000002",
+    "features": [
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "Name.000040",
+    "features": [
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "DateTime.000076",
+    "features": [
+      "DateTimeRange",
+      "DateTimeRounding",
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 4,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "Number.000016",
+    "features": [
+      "Numeric",
+      "NumericRounding"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 3,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  },
+  {
+    "benchmark_id": "Number.000088",
+    "features": [
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "DateTime.000106",
+    "features": [
+      "DateTime"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 5
+  },
+  {
+    "benchmark_id": "Address.000004",
+    "features": [
+      "Substring"
+    ],
+    "passed": true,
+    "round_solved": 0,
+    "synthetic": true,
+    "held_out_input_seen_in_given": false,
+    "n_survivors": 5,
+    "any_survivor_passes": true,
+    "rounds_used": 1,
+    "unparsed_rounds": 0,
+    "candidates_run": 5,
+    "candidates_repaired": 0
+  }
+]
