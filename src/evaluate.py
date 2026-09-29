@@ -4,6 +4,9 @@
     python -m src.evaluate --n 5          # quick smoke run
     python -m src.evaluate --ids Address.000002 Number.000087
 
+    # a second sample that shares no tasks with the first
+    python -m src.evaluate --seed 43 --exclude-from results/results.json         --run-name supplementary --out results/supplementary
+
 Full transcripts (prompts, replies, every candidate and what it produced) go to
 runs/<run-name>/, which is gitignored because they contain benchmark examples.
 Only per-task pass/fail records and the summary go to results/.
@@ -33,13 +36,19 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--n", type=int, default=30, help="number of tasks to sample")
     ap.add_argument("--seed", type=int, default=42, help="sampling seed")
     ap.add_argument("--ids", nargs="*", help="run these task ids instead of a sample")
+    ap.add_argument("--exclude-from", type=Path,
+                    help="results.json whose tasks are left out of the sample")
+    ap.add_argument("--out", type=Path, default=RESULTS_DIR, help="where results and summary go")
     ap.add_argument("--model", help="override LLM_MODEL from .env")
     ap.add_argument("--run-name", default="main", help="subfolder of runs/ for transcripts")
     ap.add_argument("--no-cache", action="store_true", help="ignore cached LLM responses")
     ap.add_argument("--no-write", action="store_true", help="don't overwrite results/ (for experiments)")
     args = ap.parse_args(argv)
 
-    ids = args.ids or sample_task_ids(args.n, args.seed)
+    exclude = set()
+    if args.exclude_from:
+        exclude = {r["benchmark_id"] for r in json.loads(args.exclude_from.read_text(encoding="utf-8"))}
+    ids = args.ids or sample_task_ids(args.n, args.seed, exclude=exclude)
     llm = LLMClient.from_env(model=args.model, use_cache=not args.no_cache)
     run_dir = RUNS_DIR / args.run_name
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -82,15 +91,17 @@ def main(argv: list[str] | None = None) -> None:
         "seed": args.seed if not args.ids else None,
         "n_requested": len(ids) if args.ids else args.n,
         "n_available": len(list_task_ids(DEFAULT_ROOT)),
+        "excluded_from": args.exclude_from.as_posix() if args.exclude_from else None,
+        "n_excluded": len(exclude),
         "n_candidates": N_CANDIDATES,
         "max_revisions": MAX_REVISIONS,
         "timeout": DEFAULT_TIMEOUT,
         "usage": asdict(llm.usage),
     }
-    RESULTS_DIR.mkdir(exist_ok=True)
-    (RESULTS_DIR / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
-    (RESULTS_DIR / "run_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
-    print(f"Wrote {write_summary(results, meta)}")
+    args.out.mkdir(parents=True, exist_ok=True)
+    (args.out / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
+    (args.out / "run_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    print(f"Wrote {write_summary(results, meta, args.out)}")
 
 
 if __name__ == "__main__":

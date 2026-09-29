@@ -19,13 +19,16 @@ def _pct(k: int, n: int) -> str:
 def build_summary(results: list[dict], meta: dict) -> str:
     n = len(results)
     passed = sum(r["passed"] for r in results)
+    pool = "sorted(task_ids)"
+    if meta.get("excluded_from"):
+        pool = f"sorted(task_ids minus the {meta['n_excluded']} tasks in {meta['excluded_from']})"
     lines = [
         "# Evaluation summary",
         "",
         f"- Model: `{meta['model']}` via `{meta['endpoint_host']}`",
         f"- Date: {meta['date']}",
         f"- Benchmark subset: `Transformation.Text`, {meta['n_available']} tasks available",
-        f"- Sample size: **{n}** tasks, drawn with `random.Random({meta['seed']}).sample(sorted(task_ids), {meta['n_requested']})`",
+        f"- Sample size: **{n}** tasks, drawn with `random.Random({meta['seed']}).sample({pool}, {meta['n_requested']})`",
         f"- Per task: {meta['n_candidates']} candidates per round, up to {meta['max_revisions']} revision rounds, "
         f"{meta['timeout']:g}s execution timeout",
         f"- Protocol: all examples but the last are given; the last is held out and only used for the final check",

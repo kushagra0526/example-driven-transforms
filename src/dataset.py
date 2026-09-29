@@ -62,9 +62,10 @@ def list_task_ids(root: Path = DEFAULT_ROOT) -> list[str]:
     return sorted(p.name for p in root.iterdir() if (p / "spec.json").is_file())
 
 
-def sample_task_ids(n: int, seed: int, root: Path = DEFAULT_ROOT) -> list[str]:
-    """A reproducible sample: the same seed and folder listing always give the same ids."""
-    ids = list_task_ids(root)
+def sample_task_ids(n: int, seed: int, root: Path = DEFAULT_ROOT,
+                    exclude: set[str] = frozenset()) -> list[str]:
+    """A reproducible sample: the same seed, folder listing and exclusions give the same ids."""
+    ids = [i for i in list_task_ids(root) if i not in exclude]
     return random.Random(seed).sample(ids, min(n, len(ids)))
 
 
