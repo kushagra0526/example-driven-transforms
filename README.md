@@ -16,7 +16,7 @@ flowchart LR
 
 ## Why
 
-Cleaning a column of dates or a folder of badly named files is the kind of job where showing three examples of what you want is faster than writing the regex. Excel's Flash Fill does exactly that, backed by a carefully engineered program-synthesis language. I wanted to know how far you get without that language: ask a general LLM for code, run the code, and keep only what reproduces the examples.
+I wanted to find out whether an LLM alone, without a hand-built domain-specific language, could handle the kind of example-driven text transformation Flash Fill does in Excel. So I built a small generate-and-rank solver to test it.
 
 ## One task, start to finish
 
@@ -174,11 +174,15 @@ In the worked example above, the prompt asked for different approaches and got t
 
 Asking for a JSON list of source strings makes the model escape its own code, and it often got that wrong. In 16 of the 35 replies, every candidate was escaped twice, so the decoded "code" was one long line full of literal `\n` sequences that can never compile. That case is unambiguous, and the harness repairs it by decoding once more; 78 of 159 candidates needed it. Partial double escaping inside regexes can't be repaired safely: the rejected `\\b` candidate in the worked example is one instance. Execution-based ranking caught that candidate as intended, but it still cost one of the five slots. A reply format that doesn't need escaping, such as fenced code blocks, would probably avoid most of this.
 
+## How this compares to real published approaches
+
+One of the given examples, which wasn't shown to the model in the initial prompt but was still used to check every candidate, was an unpadded 7-digit date ('8142089', example #19). Every one of the 11 candidates failed it, treating 8-digit numeric dates as fixed-width because that pattern held across all 15 examples the model had actually seen. What makes this a structural failure rather than a missed case: #19's failure was shown back to the model as explicit feedback across two full revision rounds, and no candidate ever fixed it. Revision could only patch around the specific failing case, not reconsider the underlying hypothesis. A version-space approach, the actual mechanism behind Flash Fill and PROSE's synthesis engine, would have kept 'always 8 digits' and '8 digits, but the first field could be shorter' as two live hypotheses from the start, ready to be disambiguated the moment #19 entered the picture, rather than requiring a patch after the fact once the assumption had already failed.
+
 ## What I'd try next
 
 The two real failures point the same way. The loop searches by asking for good guesses, and there's no structured space for it to explore systematically.
 
-- **Constrain what a candidate can be.** For a task like `DateTime.000021`, a candidate could be a list of input formats plus a fixed output template, instead of a free-form function. Adding one more format (unpadded month) then becomes an enumerable step rather than something the model has to think of on its own. More generally, candidates could be compositions of a small fixed library of primitives, with the LLM proposing likely pieces and a search putting them together.
+- **Search a constrained space instead of sampling whole programs independently.** The five candidates in each round are independent guesses, and nothing records which alternatives the examples still allow. HYSYNTH points to a middle ground that keeps the LLM. It samples programs from an LLM for the specific task, fits a probabilistic context-free grammar to those samples, and uses that grammar to guide a symbolic search over a fixed DSL. For `DateTime.000021`, the DSL would describe a date as a sequence of fields such as a 1- or 2-digit month, a 2-digit day, and a 4-digit year. The LLM's samples would make fixed-width fields likely but never rule out the variable-width reading, so the search could still reach it once `8142089` showed up among the examples. A full version-space representation, which keeps every consistent program at once, is the stronger form of the same idea. It is also more engineering than fit in a day.
 - **Repair near misses instead of regenerating.** Rank failed candidates by how many examples they get right, and ask for a targeted fix to the best one. On `DateTime.000021` the closest candidate was one example away.
 - **Ask for different hypotheses, not just different code.** For example, ask for candidates that disagree on at least one plausible input, so that a batch like the five century-cutoff-50 candidates is less likely.
 - **Test under harder conditions.** Rerun with only 2–3 given examples per task to match the classic few-shot setting. I expect the number to drop there, and that is the more interesting result.
