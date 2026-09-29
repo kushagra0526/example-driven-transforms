@@ -1,6 +1,6 @@
 import unittest
 
-from src.prompts import parse_candidates
+from src.prompts import parse_candidates, undo_double_encoding
 
 
 class ParseCandidates(unittest.TestCase):
@@ -22,6 +22,20 @@ class ParseCandidates(unittest.TestCase):
     def test_unusable(self):
         self.assertIsNone(parse_candidates(""))
         self.assertIsNone(parse_candidates('{"answer": 3}'))
+
+
+class UndoDoubleEncoding(unittest.TestCase):
+    def test_double_encoded_candidate_is_repaired(self):
+        # What a twice-escaped candidate looks like after the normal JSON decode.
+        raw = "import re\\ndef transform(x):\\n    m = re.search(r'(\\\\d+) \\\"é\\\"', x)\\n    return '\\\\n'.join([m.group(1)])"
+        fixed, changed = undo_double_encoding(raw)
+        self.assertTrue(changed)
+        self.assertEqual(fixed, "import re\ndef transform(x):\n    m = re.search(r'(\\d+) \"é\"', x)\n    return '\\n'.join([m.group(1)])")
+        compile(fixed, "<test>", "exec")
+
+    def test_normal_code_untouched(self):
+        code = "def transform(x):\n    return '\\n'.join(x.split())"
+        self.assertEqual(undo_double_encoding(code), (code, False))
 
 
 if __name__ == "__main__":

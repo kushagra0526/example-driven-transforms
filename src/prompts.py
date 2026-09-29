@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import warnings
 
 from .dataset import Example
 
@@ -23,7 +24,11 @@ RULES = f"""Rules for every candidate:
 - Implement a general rule. Do not hard-code the example outputs or build a lookup table from them.
 - `transform` must return a str, or None where the examples show a null output."""
 
-FORMAT = 'Reply with exactly this JSON shape: {"candidates": ["<python source>", ...]}'
+FORMAT = (
+    'Reply with exactly this JSON shape: {"candidates": ["<python source>", ...]}\n'
+    "JSON-escape each source string exactly once: a line break becomes \\n, and a single "
+    "backslash in the Python code (for example in a regex) becomes \\\\."
+)
 
 MAX_CODE_CHARS_IN_FEEDBACK = 1500
 
@@ -127,6 +132,22 @@ def parse_candidates(text: str) -> list[str] | None:
         if isinstance(item, str) and item.strip():
             out.append(_strip_fence(item))
     return out or None
+
+
+def undo_double_encoding(code: str) -> tuple[str, bool]:
+    """Repair a candidate the model JSON-escaped twice.
+
+    Then the decoded source is one long line holding literal "\\n" sequences,
+    which can never compile. Only that unambiguous case is touched: code that
+    already has real line breaks is returned unchanged.
+    """
+    if "\n" in code or "\\n" not in code:
+        return code, False
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)  # unknown escapes are kept as-is
+        # backslashreplace protects non-ASCII text from the latin-1 round trip.
+        fixed = code.encode("latin-1", "backslashreplace").decode("unicode_escape")
+    return fixed, fixed != code
 
 
 def _salvage_truncated(text: str) -> list[str] | None:

@@ -63,6 +63,8 @@ def main(argv: list[str] | None = None) -> None:
             "any_survivor_passes": any(passed_flags),
             "rounds_used": len(t["rounds"]),
             "unparsed_rounds": sum(not r["parsed"] for r in t["rounds"]),
+            "candidates_run": sum(len(r["candidates"]) for r in t["rounds"]),
+            "candidates_repaired": sum(c["repaired_encoding"] for r in t["rounds"] for c in r["candidates"]),
         })
         mark = "PASS" if t["passed"] else "fail"
         print(f"[{i:>2}/{len(ids)}] {mark}  round={t['round_solved']!s:<8} {task_id}  "

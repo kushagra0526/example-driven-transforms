@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .dataset import Example, Task
 from .llm import LLMClient
-from .prompts import generation_messages, parse_candidates, revision_messages
+from .prompts import generation_messages, parse_candidates, revision_messages, undo_double_encoding
 from .sandbox import DEFAULT_TIMEOUT, run_candidate
 
 N_CANDIDATES = 5
@@ -92,7 +92,10 @@ def solve(task: Task, llm: LLMClient, n_candidates: int = N_CANDIDATES,
         parse_note = None
         # Identical candidates would only repeat the same result.
         codes = list(dict.fromkeys(codes))[:n_candidates]
-        records = [check_candidate(code, given) for code in codes]
+        records = []
+        for code in codes:
+            code, repaired = undo_double_encoding(code)
+            records.append({**check_candidate(code, given), "repaired_encoding": repaired})
         round_log["candidates"] = records
         survivors = [r for r in records if r["survived"]]
         if survivors:

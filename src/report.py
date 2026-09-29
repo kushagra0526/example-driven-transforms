@@ -81,6 +81,8 @@ def build_summary(results: list[dict], meta: dict) -> str:
         f"Accuracy excluding them: {sum(r['passed'] for r in clean)}/{len(clean)} ({_pct(sum(r['passed'] for r in clean), len(clean))}).",
         f"- Model replies that held no parseable candidate list: {sum(r['unparsed_rounds'] for r in results)} "
         f"of {sum(r['rounds_used'] for r in results)} generation rounds. Each still counts as a used round.",
+        f"- Candidates the model JSON-escaped twice (one long line of literal `\\n`), repaired by decoding once more: "
+        f"{sum(r['candidates_repaired'] for r in results)} of {sum(r['candidates_run'] for r in results)} executed.",
         f"- LLM usage: {meta['usage']['calls']} requests, "
         f"{meta['usage']['prompt_tokens']:,} prompt + {meta['usage']['completion_tokens']:,} completion tokens "
         f"({meta['usage']['cached_calls']} of the requests replayed from the local response cache on the final run).",
