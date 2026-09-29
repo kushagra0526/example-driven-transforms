@@ -1,0 +1,12 @@
+# benchmark data is cloned locally and never committed
+data/
+
+# secrets
+.env
+
+# local run artifacts: full transcripts include benchmark examples, and the LLM response cache
+runs/
+.cache/
+
+__pycache__/
+*.pyc
